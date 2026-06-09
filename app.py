@@ -6,14 +6,14 @@ import os
 app = Flask(__name__)
 
 def get_db():
-return pymysql.connect(
-host=os.environ.get('MYSQLHOST', 'localhost'),
-user=os.environ.get('MYSQLUSER', 'avnadmin'),
-password=os.environ.get('MYSQLPASSWORD'),
-database=os.environ.get('MYSQLDATABASE', 'defaultdb'),
-port=int(os.environ.get('MYSQLPORT', 3306)),
-cursorclass=pymysql.cursors.DictCursor
-)
+    return pymysql.connect(
+        host=os.environ.get('MYSQLHOST', 'localhost'),
+        user=os.environ.get('MYSQLUSER', 'avnadmin'),
+        password=os.environ.get('MYSQLPASSWORD'),
+        database=os.environ.get('MYSQLDATABASE', 'defaultdb'),
+        port=int(os.environ.get('MYSQLPORT', 3306)),
+        cursorclass=pymysql.cursors.DictCursor
+    )
 
 # --- LOGIN ---
 @app.route('/login', methods=['POST'])
