@@ -15,25 +15,31 @@ def get_db():
         cursorclass=pymysql.cursors.DictCursor
     )
 
-# --- LOGIN ---
-# --- LOGIN ---
+# 1. Der Login-Endpunkt (mit dem LOWER-Fix, den du schon hast)
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
     pw_hash = hashlib.sha256(data['password'].encode()).hexdigest()
-    db = get_db()
-    cur = db.cursor()
-    
-    # Hier nutzen wir LOWER(), um alles kleingeschrieben zu vergleichen
-    # So ist 'Pepe' gleich 'pepe'
+    # WICHTIG: LOWER hier, damit 'Pepe' == 'pepe'
     query = "SELECT id, username, role, points FROM user WHERE LOWER(username)=LOWER(%s) AND password_hash=%s"
     cur.execute(query, (data['username'], pw_hash))
-    
     user = cur.fetchone()
-    db.close()
     if user:
-        return jsonify({"success": True, "user": user})
-    return jsonify({"success": False, "message": "Falsche Zugangsdaten"}), 401
+        # Hier sicherstellen, dass die Daten als Dictionary zurückgegeben werden
+        return jsonify({"user": {"id": user[0], "username": user[1], "role": user[2], "points": user[3]}})
+    return jsonify({"message": "Falsch"}), 401
+
+# 2. Der neue Punkte-Endpunkt (für dein loadPoints() in MainActivity.java)
+@app.route('/get_points/<int:user_id>', methods=['GET'])
+def get_points(user_id):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("SELECT points FROM user WHERE id = %s", (user_id,))
+    data = cur.fetchone()
+    db.close()
+    if data:
+        return jsonify({"points": data[0]})
+    return jsonify({"error": "Nicht gefunden"}), 404
 # --- PUNKTE ANZEIGEN ---
 @app.route('/punkte/<int:user_id>', methods=['GET'])
 def punkte(user_id):
