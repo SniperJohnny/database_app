@@ -1,17 +1,19 @@
 from flask import Flask, request, jsonify
 import pymysql
 import hashlib
+import os
 
 app = Flask(__name__)
 
 def get_db():
-    return pymysql.connect(
-        host='localhost',
-        user='root',
-        password='DEIN_DB_PASSWORT', # ← hier dein MariaDB-Passwort eintragen
-        database='hapunkte',
-        cursorclass=pymysql.cursors.DictCursor
-    )
+return pymysql.connect(
+host=os.environ.get('MYSQLHOST', 'localhost'),
+user=os.environ.get('MYSQLUSER', 'avnadmin'),
+password=os.environ.get('MYSQLPASSWORD'),
+database=os.environ.get('MYSQLDATABASE', 'defaultdb'),
+port=int(os.environ.get('MYSQLPORT', 3306)),
+cursorclass=pymysql.cursors.DictCursor
+)
 
 # --- LOGIN ---
 @app.route('/login', methods=['POST'])
