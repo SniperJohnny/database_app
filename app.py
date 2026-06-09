@@ -16,20 +16,24 @@ def get_db():
     )
 
 # --- LOGIN ---
+# --- LOGIN ---
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
     pw_hash = hashlib.sha256(data['password'].encode()).hexdigest()
     db = get_db()
     cur = db.cursor()
-    cur.execute("SELECT id, username, role, points FROM user WHERE username=%s AND password_hash=%s",
-                (data['username'], pw_hash))
+    
+    # Hier nutzen wir LOWER(), um alles kleingeschrieben zu vergleichen
+    # So ist 'Pepe' gleich 'pepe'
+    query = "SELECT id, username, role, points FROM user WHERE LOWER(username)=LOWER(%s) AND password_hash=%s"
+    cur.execute(query, (data['username'], pw_hash))
+    
     user = cur.fetchone()
     db.close()
     if user:
         return jsonify({"success": True, "user": user})
     return jsonify({"success": False, "message": "Falsche Zugangsdaten"}), 401
-
 # --- PUNKTE ANZEIGEN ---
 @app.route('/punkte/<int:user_id>', methods=['GET'])
 def punkte(user_id):
