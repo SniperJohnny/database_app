@@ -33,6 +33,9 @@ def login():
     print(f"DEBUG: Typ von user ist: {type(user)} und Inhalt: {user}")
     db.close()
     
+    print(f"DEBUG: Suche nach Username={data['username']} und Passwort={data['password']}")
+    print(f"DEBUG: Ergebnis aus DB={user}")
+    
     if user:
         # Hier geben wir die Daten explizit aus dem 'user'-Tupel zurück
         # user[0]=id, user[1]=username, user[2]=role, user[3]=points
