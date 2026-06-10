@@ -30,11 +30,20 @@ def login():
     cur.execute(query, (data['username'], pw_hash))
     
     user = cur.fetchone()
-    db.close()             # Wichtig: Verbindung nach dem Lesen schließen
+    db.close()
     
     if user:
-        return jsonify({"user": {"id": user[0], "username": user[1], "role": user[2], "points": user[3]}})
-    return jsonify({"message": "Falsch"}), 401
+        # Hier geben wir die Daten explizit aus dem 'user'-Tupel zurück
+        # user[0]=id, user[1]=username, user[2]=role, user[3]=points
+        user_data = {
+            "id": user[0],
+            "username": user[1],
+            "role": user[2],
+            "points": user[3]
+        }
+        return jsonify({"user": user_data})
+    else:
+        return jsonify({"message": "Benutzer nicht gefunden"}), 401
 # 2. Der neue Punkte-Endpunkt (für dein loadPoints() in MainActivity.java)
 @app.route('/get_points/<int:user_id>', methods=['GET'])
 def get_points(user_id):
