@@ -30,6 +30,7 @@ def login():
     cur.execute(query, (data['username'], pw_hash))
     
     user = cur.fetchone()
+    print(f"DEBUG: Typ von user ist: {type(user)} und Inhalt: {user}")
     db.close()
     
     if user:
