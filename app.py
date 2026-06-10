@@ -20,34 +20,15 @@ def get_db():
 def login():
     data = request.json
     pw_hash = hashlib.sha256(data['password'].encode()).hexdigest()
-    
-    # --- DIESE ZEILEN FEHLTEN ODER WAREN FALSCH ---
-    db = get_db()          
-    cur = db.cursor()      
-    # --------------------------------------------
-    
+    # WICHTIG: LOWER hier, damit 'Pepe' == 'pepe'
     query = "SELECT id, username, role, points FROM user WHERE LOWER(username)=LOWER(%s) AND password_hash=%s"
     cur.execute(query, (data['username'], pw_hash))
-    
     user = cur.fetchone()
-    print(f"DEBUG: Typ von user ist: {type(user)} und Inhalt: {user}")
-    db.close()
-    
-    print(f"DEBUG: Suche nach Username={data['username']} und Passwort={data['password']}")
-    print(f"DEBUG: Ergebnis aus DB={user}")
-    
     if user:
-        # Hier geben wir die Daten explizit aus dem 'user'-Tupel zurück
-        # user[0]=id, user[1]=username, user[2]=role, user[3]=points
-        user_data = {
-            "id": user[0],
-            "username": user[1],
-            "role": user[2],
-            "points": user[3]
-        }
-        return jsonify({"user": user_data})
-    else:
-        return jsonify({"message": "Benutzer nicht gefunden"}), 401
+        # Hier sicherstellen, dass die Daten als Dictionary zurückgegeben werden
+        return jsonify({"user": {"id": user[0], "username": user[1], "role": user[2], "points": user[3]}})
+    return jsonify({"message": "Falsch"}), 401
+
 # 2. Der neue Punkte-Endpunkt (für dein loadPoints() in MainActivity.java)
 @app.route('/get_points/<int:user_id>', methods=['GET'])
 def get_points(user_id):
